@@ -35,7 +35,6 @@ class ArticleSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user_id = self.context['user_id']
         validated_data['author_id'] = user_id
-        print(user_id)
         return super().create(validated_data)
 
 
