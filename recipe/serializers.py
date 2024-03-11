@@ -5,6 +5,8 @@ from .models import (
     Recipe,
     Ingredient
 )
+from django.shortcuts import get_object_or_404
+from rest_framework.exceptions import ValidationError
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -37,8 +39,23 @@ class RecipePostSerializer(serializers.ModelSerializer):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
+    unit_name = serializers.CharField(source='get_unit_display', read_only=True)
+
     class Meta:
         model = Ingredient
-        fields = ['id', 'recipe', 'title', 'unit', 'quantity', 'is_active']
+        fields = ['id', 'title', 'unit_name', 'unit', 'quantity', 'is_active']
+
+    def validate(self, attrs):
+        recipe_id = self.context.get('recipe_id')
+        recipe = get_object_or_404(Recipe, id=recipe_id)
+        if recipe.author_id != self.context['request'].user.id:
+            raise ValidationError({'author_id': 'You do not have permission to!!!'})
+        return attrs
+
+    def create(self, validated_data):
+        recipe_id = self.context.get('recipe_id')
+        validated_data['recipe_id'] = recipe_id
+        return super().create(validated_data)
+
 
 

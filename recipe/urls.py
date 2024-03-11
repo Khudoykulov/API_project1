@@ -9,7 +9,9 @@ from recipe.views import (
     TagRUDAPIView,
     TagViewSet,
     RecipeListCreateAPIView,
-    RecipeRUDAPIView
+    RecipeRUDAPIView,
+    RecipeIngredientListCreateAPIView,
+    RecipeIngredientRUDAPIView
 )
 app_name = 'recipe'
 
@@ -26,7 +28,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('list-create/', RecipeListCreateAPIView.as_view(), name='list-create'),
     path('list-rud/<slug:slug>/', RecipeRUDAPIView.as_view(), name='list-rud'),
-
-
+    path('<int:recipe_id>/ingredients', RecipeIngredientListCreateAPIView.as_view(), name='ingredients'),
+    path('<int:recipe_id>/ingredients/<int:pk>/', RecipeIngredientRUDAPIView.as_view(), name='ingredients-rud')
 
 ]

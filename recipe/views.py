@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser
-from .permissions import IsAuthorOrReadOnly
+from .permissions import IsAuthorOrReadOnly, IsAuthorOrReadOnlyIngredient
 
 
 class TagAPIView(APIView):
@@ -180,3 +180,27 @@ class RecipeRUDAPIView(generics.RetrieveUpdateDestroyAPIView):
         self.perform_destroy(instance)
         return Response({'message': 'delete'}, status=status.HTTP_204_NO_CONTENT)
 
+
+class RecipeIngredientListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Ingredient.objects.all()
+    serializer_class = IngredientSerializer
+    permission_classes = [IsAuthorOrReadOnlyIngredient]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        recipe_id = self.kwargs.get('recipe_id')
+        author_id = get_object_or_404(Recipe, id=recipe_id).author_id
+        if self.request.user.id == author_id:
+            qs = qs.filter(recipe_id=recipe_id)
+        return qs.filter(recipe_id=recipe_id, is_active=True)
+
+    def get_serializer_context(self):
+        context = super(RecipeIngredientListCreateAPIView, self).get_serializer_context()
+        context['recipe_id'] = self.kwargs.get('recipe_id')
+        return context
+
+
+class RecipeIngredientRUDAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Ingredient.objects.all()
+    serializer_class = IngredientSerializer
+    permission_classes = [IsAuthorOrReadOnlyIngredient]
