@@ -1,7 +1,7 @@
 from django.shortcuts import render
-from rest_framework import viewsets
+from rest_framework import viewsets, generics, status
 from rest_framework.response import Response
-from .serializers import TagSerializer, RecipeSerializer, IngredientSerializer
+from .serializers import TagSerializer, RecipeSerializer, IngredientSerializer, RecipePostSerializer
 from rest_framework.views import APIView
 from .models import Tag, Recipe, Ingredient
 from drf_yasg import openapi
@@ -9,6 +9,8 @@ from drf_yasg.utils import swagger_auto_schema
 from django.shortcuts import get_object_or_404
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser
+from .permissions import IsAuthorOrReadOnly
 
 
 class TagAPIView(APIView):
@@ -153,3 +155,28 @@ class TagViewSet(ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = [IsAuthenticated]
+
+
+class RecipeListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Recipe.objects.all()
+    serializer_class = RecipeSerializer
+    permission_classes = [IsAuthenticated,]
+    # parser_classes = [MultiPartParser]
+
+    def get_serializer_class(self):
+        if self.request.method == "GET":
+            return RecipeSerializer
+        return RecipePostSerializer
+
+
+class RecipeRUDAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Recipe.objects.all()
+    serializer_class = RecipeSerializer
+    permission_classes = [IsAuthorOrReadOnly,]
+    lookup_field = 'slug'
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response({'message': 'delete'}, status=status.HTTP_204_NO_CONTENT)
+

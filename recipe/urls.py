@@ -7,7 +7,9 @@ from recipe.views import (
     TagDeleteAPIView,
     TagPartialUpdateAPIView,
     TagRUDAPIView,
-    TagViewSet
+    TagViewSet,
+    RecipeListCreateAPIView,
+    RecipeRUDAPIView
 )
 app_name = 'recipe'
 
@@ -21,7 +23,10 @@ urlpatterns = [
     # path('tag-delete/<int:pk>/', TagDeleteAPIView.as_view(), name='tag-delete'),
     # path('tag-partial-update/<int:pk>/', TagPartialUpdateAPIView.as_view(), name='tag-partial-update'),
     # path('tag-rud/<int:pk>/', TagRUDAPIView.as_view(), name='tag-rud'),
-    path('', include(router.urls))
+    path('', include(router.urls)),
+    path('list-create/', RecipeListCreateAPIView.as_view(), name='list-create'),
+    path('list-rud/<slug:slug>/', RecipeRUDAPIView.as_view(), name='list-rud'),
+
 
 
 ]
