@@ -23,7 +23,7 @@ class RecipeAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'author', 'created_date')
     search_fields = ('title', 'author__username')
     list_filter = ('created_date', )
-    autocomplete_fields = ('author', )
+    # autocomplete_fields = ('author', )
     date_hierarchy = 'created_date'
     filter_horizontal = ('tags', )
     readonly_fields = ('slug', 'created_date')
