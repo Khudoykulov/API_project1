@@ -31,3 +31,9 @@ class UserSerializer(serializers.ModelSerializer):
         user = super().create(validated_data)
         user.set_password(password1)
         return user
+
+
+class UserSerializer2(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email', 'last_name', 'first_name', 'password')
